@@ -1,0 +1,21 @@
+{
+  "info": {
+    "name": "clinic-quiz",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    { "name": "A1 by-last-name", "request": { "method": "GET", "url": "http://localhost:8081/api/patients/by-last-name?lastName=uwase" } },
+    { "name": "A2 by-status", "request": { "method": "GET", "url": "http://localhost:8081/api/appointments/by-status?status=SCHEDULED" } },
+    { "name": "A3 between", "request": { "method": "GET", "url": "http://localhost:8081/api/appointments/between?start=2026-10-01&end=2026-10-31" } },
+    { "name": "A4 save", "request": { "method": "POST", "url": "http://localhost:8081/api/appointments/save", "body": { "mode": "raw", "raw": "{\"appointmentDate\":\"2026-10-20\",\"reason\":\"Third opinion\",\"status\":\"SCHEDULED\",\"patient\":{\"id\":\"ed5fd906-6798-42b0-a79b-fdf5d3bea7d0\"},\"doctor\":{\"id\":\"c1469138-16d2-495a-8bff-1a1ddfa0eef7\"}}", "options": { "raw": { "language": "json" } } } } },
+    { "name": "B1 by-specialization", "request": { "method": "GET", "url": "http://localhost:8081/api/doctors/by-specialization?name=cardiology" } },
+    { "name": "B2 without-office", "request": { "method": "GET", "url": "http://localhost:8081/api/doctors/without-office" } },
+    { "name": "B3 unused", "request": { "method": "GET", "url": "http://localhost:8081/api/specializations/unused" } },
+    { "name": "B4 of-doctor", "request": { "method": "GET", "url": "http://localhost:8081/api/patients/of-doctor/c1469138-16d2-495a-8bff-1a1ddfa0eef7" } },
+    { "name": "C1 status-count", "request": { "method": "GET", "url": "http://localhost:8081/api/appointments/status/by-status" } },
+    { "name": "C2 frequent", "request": { "method": "GET", "url": "http://localhost:8081/api/patients/frequent?min=3" } },
+    { "name": "C3 busiest", "request": { "method": "GET", "url": "http://localhost:8081/api/offices/busiest" } },
+    { "name": "C4 cancel-day", "request": { "method": "PATCH", "url": "http://localhost:8081/api/appointments/cancel-day?doctorId=c1469138-16d2-495a-8bff-1a1ddfa0eef7&date=2026-10-20" } },
+    { "name": "Bonus delete-cancelled-before", "request": { "method": "DELETE", "url": "http://localhost:8081/api/appointments/cancelled-before?date=2026-11-01" } }
+  ]
+}

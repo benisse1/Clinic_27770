@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kigali.clinic.rw.domain.Doctor;
 import kigali.clinic.rw.domain.Specialization;
@@ -59,6 +60,7 @@ public class SpecializationService {
         return "deleted successfully";
     }
 
+    @Transactional
     public String addDoctorToSpecialization(UUID specId, UUID doctorId) {
         Optional<Specialization> specOpt = specializationRepo.findById(specId);
         Optional<Doctor> docOpt = doctorRepo.findById(doctorId);
@@ -75,6 +77,7 @@ public class SpecializationService {
         return "doctor linked to specialization successfully";
     }
 
+    @Transactional
     public String removeDoctorFromSpecialization(UUID specId, UUID doctorId) {
         Optional<Specialization> specOpt = specializationRepo.findById(specId);
         Optional<Doctor> docOpt = doctorRepo.findById(doctorId);
