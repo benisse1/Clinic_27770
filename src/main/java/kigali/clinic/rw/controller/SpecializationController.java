@@ -21,12 +21,18 @@ public class SpecializationController {
 
     @PostMapping("/save")
     public ResponseEntity<?> save(@RequestBody Specialization s) {
-        return new ResponseEntity<>(specializationService.saveSpecialization(s), HttpStatus.CREATED);
+        String msg = specializationService.saveSpecialization(s);
+        return new ResponseEntity<>(msg, HttpStatus.CREATED);
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<Specialization>> all() {
         return ResponseEntity.ok(specializationService.getAllSpecializations());
+    }
+
+    @GetMapping("/unused")
+    public ResponseEntity<List<Specialization>> unused() {
+        return ResponseEntity.ok(specializationService.getUnused());
     }
 
     @GetMapping("/{id}")
@@ -46,20 +52,5 @@ public class SpecializationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable UUID id) {
         return ResponseEntity.ok(specializationService.deleteSpecialization(id));
-    }
-
-    @PostMapping("/{specId}/add-doctor/{doctorId}")
-    public ResponseEntity<?> addDoctor(@PathVariable UUID specId, @PathVariable UUID doctorId) {
-        return ResponseEntity.ok(specializationService.addDoctorToSpecialization(specId, doctorId));
-    }
-
-    @DeleteMapping("/{specId}/remove-doctor/{doctorId}")
-    public ResponseEntity<?> removeDoctor(@PathVariable UUID specId, @PathVariable UUID doctorId) {
-        return ResponseEntity.ok(specializationService.removeDoctorFromSpecialization(specId, doctorId));
-    }
-
-    @GetMapping("/unused")
-    public ResponseEntity<List<Specialization>> unused() {
-        return ResponseEntity.ok(specializationService.getUnused());
     }
 }

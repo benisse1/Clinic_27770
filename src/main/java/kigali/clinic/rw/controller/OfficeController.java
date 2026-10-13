@@ -25,12 +25,27 @@ public class OfficeController {
 
     @PostMapping("/save")
     public ResponseEntity<?> save(@RequestBody Office office) {
-        return new ResponseEntity<>(officeService.saveOffice(office), HttpStatus.CREATED);
+        String msg = officeService.saveOffice(office);
+        return new ResponseEntity<>(msg, HttpStatus.CREATED);
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<Office>> all() {
         return ResponseEntity.ok(officeService.getAllOffices());
+    }
+
+    @GetMapping("/free")
+    public ResponseEntity<List<Office>> free() {
+        return ResponseEntity.ok(officeService.getFreeOffices());
+    }
+
+    @GetMapping("/busiest")
+    public ResponseEntity<?> busiest() {
+        List<Object[]> rows = appointmentService.getBusiestOffice();
+        if (rows.isEmpty()) {
+            return ResponseEntity.ok("No appointments yet");
+        }
+        return ResponseEntity.ok(rows.get(0));
     }
 
     @GetMapping("/{id}")
@@ -50,14 +65,5 @@ public class OfficeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable UUID id) {
         return ResponseEntity.ok(officeService.deleteOffice(id));
-    }
-
-    @GetMapping("/busiest")
-    public ResponseEntity<?> busiest() {
-        List<Object[]> rows = appointmentService.getBusiestOffice();
-        if (rows.isEmpty()) {
-            return ResponseEntity.ok("No appointments yet");
-        }
-        return ResponseEntity.ok(rows.get(0));
     }
 }

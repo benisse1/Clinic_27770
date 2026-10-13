@@ -16,6 +16,6 @@
     { "name": "C2 frequent", "request": { "method": "GET", "url": "http://localhost:8081/api/patients/frequent?min=3" } },
     { "name": "C3 busiest", "request": { "method": "GET", "url": "http://localhost:8081/api/offices/busiest" } },
     { "name": "C4 cancel-day", "request": { "method": "PATCH", "url": "http://localhost:8081/api/appointments/cancel-day?doctorId=c1469138-16d2-495a-8bff-1a1ddfa0eef7&date=2026-10-20" } },
-    { "name": "Bonus delete-cancelled-before", "request": { "method": "DELETE", "url": "http://localhost:8081/api/appointments/cancelled-before?date=2026-11-01" } }
+    { "name": "Last delete-cancelled-before", "request": { "method": "DELETE", "url": "http://localhost:8081/api/appointments/cancelled-before?date=2026-11-01" } }
   ]
 }

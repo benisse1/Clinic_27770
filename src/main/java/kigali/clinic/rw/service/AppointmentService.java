@@ -6,15 +6,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import kigali.clinic.rw.domain.Appointment;
 import kigali.clinic.rw.domain.AppointmentStatus;
-import kigali.clinic.rw.domain.Patient;
 import kigali.clinic.rw.repository.AppointmentRepository;
+import kigali.clinic.rw.repository.DoctorRepository;
+import kigali.clinic.rw.repository.PrescriptionRepository;
 
 @Service
 public class AppointmentService {
@@ -22,17 +20,21 @@ public class AppointmentService {
     @Autowired
     private AppointmentRepository appointmentRepo;
 
-    public String saveAppointment(Appointment appointment) {
-        if (appointment.getDoctor() != null && appointment.getAppointmentDate() != null) {
-            boolean booked = appointmentRepo.existsByDoctorAndAppointmentDateAndStatusNot(
-                    appointment.getDoctor(),
-                    appointment.getAppointmentDate(),
-                    AppointmentStatus.CANCELLED);
+    @Autowired
+    private DoctorRepository doctorRepo;
 
-            if (booked) {
-                return "Doctor is already booked on that date";
-            }
+    @Autowired
+    private PrescriptionRepository prescriptionRepo;
+
+    // B1
+    public String saveAppointment(Appointment appointment) {
+        if (appointment.getAppointmentDate() == null) {
+            return "Appointment date cannot be in the past";
         }
+        if (appointment.getAppointmentDate().isBefore(LocalDate.now())) {
+            return "Appointment date cannot be in the past";
+        }
+        appointment.setStatus(AppointmentStatus.SCHEDULED);
         appointmentRepo.save(appointment);
         return "saved successfully";
     }
@@ -45,9 +47,13 @@ public class AppointmentService {
         return appointmentRepo.findById(id);
     }
 
+    // C4 modification: block deleting an appointment that has prescriptions
     public String deleteAppointment(UUID id) {
         if (!appointmentRepo.existsById(id)) {
             return "Appointment not found";
+        }
+        if (prescriptionRepo.existsByAppointmentId(id)) {
+            return "That appointment has prescriptions, delete them first";
         }
         appointmentRepo.deleteById(id);
         return "deleted successfully";
@@ -61,10 +67,6 @@ public class AppointmentService {
         return appointmentRepo.findByAppointmentDateBetweenOrderByAppointmentDateAsc(start, end);
     }
 
-    public List<Patient> getPatientsOf(UUID doctorId) {
-        return appointmentRepo.patientsOf(doctorId);
-    }
-
     public List<Object[]> getStatusCount() {
         return appointmentRepo.statusCount();
     }
@@ -73,19 +75,67 @@ public class AppointmentService {
         return appointmentRepo.busiestOffice();
     }
 
-    @Transactional
-    public String cancelDay(UUID doctorId, LocalDate date) {
-        int n = appointmentRepo.cancelDay(doctorId, date, AppointmentStatus.CANCELLED, AppointmentStatus.COMPLETED);
-        return n + " appointments cancelled";
+    // B2
+    public String changeStatus(UUID id, AppointmentStatus newStatus) {
+        Optional<Appointment> apptOpt = appointmentRepo.findById(id);
+        if (apptOpt.isEmpty()) {
+            return "The appointment with that id does not exist";
+        }
+        Appointment appointment = apptOpt.get();
+        AppointmentStatus current = appointment.getStatus();
+
+        boolean allowed = false;
+        if (current == AppointmentStatus.SCHEDULED &&
+                (newStatus == AppointmentStatus.CONFIRMED || newStatus == AppointmentStatus.CANCELLED)) {
+            allowed = true;
+        } else if (current == AppointmentStatus.CONFIRMED &&
+                (newStatus == AppointmentStatus.COMPLETED || newStatus == AppointmentStatus.CANCELLED)) {
+            allowed = true;
+        }
+
+        if (!allowed) {
+            return "Cannot change status from " + current + " to " + newStatus;
+        }
+
+        appointment.setStatus(newStatus);
+        appointmentRepo.save(appointment);
+        return "Appointment status updated successfully";
     }
 
-    public Page<Appointment> getPage(Pageable pageable) {
-        return appointmentRepo.findAll(pageable);
+    // B3
+    public String reschedule(UUID id, LocalDate newDate) {
+        Optional<Appointment> apptOpt = appointmentRepo.findById(id);
+        if (apptOpt.isEmpty()) {
+            return "The appointment with that id does not exist";
+        }
+        Appointment appointment = apptOpt.get();
+
+        if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            return "A COMPLETED appointment cannot be rescheduled";
+        }
+        if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
+            return "A CANCELLED appointment cannot be rescheduled";
+        }
+        if (newDate == null || newDate.isBefore(LocalDate.now())) {
+            return "Appointment date cannot be in the past";
+        }
+        if (appointment.getDoctor() != null &&
+                appointmentRepo.existsByDoctorAndAppointmentDateAndStatusNot(
+                        appointment.getDoctor(), newDate, AppointmentStatus.CANCELLED)) {
+            return "Doctor is already booked on that date";
+        }z
+
+        appointment.setAppointmentDate(newDate);
+        appointment.setStatus(AppointmentStatus.SCHEDULED);
+        appointmentRepo.save(appointment);
+        return "Appointment rescheduled successfully";
     }
 
-    @Transactional
-    public String deleteCancelledBefore(LocalDate date) {
-        int n = appointmentRepo.deleteCancelledBefore(AppointmentStatus.CANCELLED, date);
-        return n + " appointments deleted";
+    // Bonus
+    public List<Appointment> getCancelledBefore(LocalDate date) {
+        return appointmentRepo.findByStatusOrderByAppointmentDateAsc(AppointmentStatus.CANCELLED)
+                .stream()
+                .filter(a -> a.getAppointmentDate().isBefore(date))
+                .toList();
     }
 }

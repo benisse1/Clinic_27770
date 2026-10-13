@@ -1,0 +1,25 @@
+{
+  "info": {
+    "name": "clinic-quiz2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    { "name": "A1 Add specialization", "request": { "method": "PUT", "url": "http://localhost:8081/api/doctors/967e48d6-f1a5-4788-8ac7-8b11df65473f/specializations/dee09311-2838-4923-9297-4146b60f7328" } },
+    { "name": "A2 Remove specialization", "request": { "method": "DELETE", "url": "http://localhost:8081/api/doctors/967e48d6-f1a5-4788-8ac7-8b11df65473f/specializations/dee09311-2838-4923-9297-4146b60f7328" } },
+    { "name": "A3 Free offices", "request": { "method": "GET", "url": "http://localhost:8081/api/offices/free" } },
+    { "name": "A4 Move doctor office", "request": { "method": "PATCH", "url": "http://localhost:8081/api/doctors/47ff2e1b-40c7-4b56-888f-34fe316012d8/office?officeNumber=101" } },
+    { "name": "B1 Save appointment", "request": { "method": "POST", "url": "http://localhost:8081/api/appointments/save" } },
+    { "name": "B2 Change status", "request": { "method": "PATCH", "url": "http://localhost:8081/api/appointments/6c363fb6-c8ca-4375-8f63-d6a5f8689068/status?status=SCHEDULED" } },
+    { "name": "B3 Reschedule", "request": { "method": "PATCH", "url": "http://localhost:8081/api/appointments/a64b1a78-3028-42b5-8e54-54158fe68fc2/reschedule?newDate=2026-10-22" } },
+    { "name": "C1 Save prescription", "request": { "method": "POST", "url": "http://localhost:8081/api/prescriptions/save?appointmentId=6c363fb6-c8ca-4375-8f63-d6a5f8689068" } },
+    { "name": "C2 Prescriptions of appointment", "request": { "method": "GET", "url": "http://localhost:8081/api/prescriptions/appointment/6c363fb6-c8ca-4375-8f63-d6a5f8689068" } },
+    { "name": "C3 Patient prescription history", "request": { "method": "GET", "url": "http://localhost:8081/api/prescriptions/patient/SS001" } },
+    { "name": "C4 Update prescription", "request": { "method": "PUT", "url": "http://localhost:8081/api/prescriptions/update/f22fd73c-f54b-4351-b8be-ca06ad3334c9" } },
+    { "name": "D1 Doctor agenda", "request": { "method": "GET", "url": "http://localhost:8081/api/doctors/47ff2e1b-40c7-4b56-888f-34fe316012d8/agenda?date=2026-10-20" } },
+    { "name": "D2 Patient upcoming", "request": { "method": "GET", "url": "http://localhost:8081/api/patients/SS001/upcoming" } },
+    { "name": "D3 Search doctors", "request": { "method": "GET", "url": "http://localhost:8081/api/doctors/search?name=gis" } },
+    { "name": "D4 Dashboard summary", "request": { "method": "GET", "url": "http://localhost:8081/api/dashboard/summary" } },
+    { "name": "Bonus top medicines", "request": { "method": "GET", "url": "http://localhost:8081/api/prescriptions/stats/top-medicines" } },
+    { "name": "Bonus workload", "request": { "method": "GET", "url": "http://localhost:8081/api/doctors/workload?start=2026-10-01&end=2026-10-31" } }
+  ]
+}

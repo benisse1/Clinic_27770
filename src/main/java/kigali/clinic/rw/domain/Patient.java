@@ -17,6 +17,9 @@ public class Patient {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(name = "ss_number", unique = true)
+    private String ssNumber;
+
     @Column(name = "first_name")
     private String firstName;
 
@@ -31,6 +34,9 @@ public class Patient {
     private List<Appointment> appointments = new ArrayList<>();
 
     public UUID getId() { return id; }
+
+    public String getSsNumber() { return ssNumber; }
+    public void setSsNumber(String ssNumber) { this.ssNumber = ssNumber; }
 
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }

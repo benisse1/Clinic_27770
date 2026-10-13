@@ -10,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import kigali.clinic.rw.domain.Patient;
-import kigali.clinic.rw.service.AppointmentService;
-import kigali.clinic.rw.service.DoctorService;
 import kigali.clinic.rw.service.PatientService;
 
 @RestController
@@ -21,20 +19,33 @@ public class PatientController {
     @Autowired
     private PatientService patientService;
 
-    @Autowired
-    private DoctorService doctorService;
-
-    @Autowired
-    private AppointmentService appointmentService;
-
     @PostMapping("/save")
     public ResponseEntity<?> save(@RequestBody Patient patient) {
-        return new ResponseEntity<>(patientService.savePatient(patient), HttpStatus.CREATED);
+        String msg = patientService.savePatient(patient);
+        return new ResponseEntity<>(msg, HttpStatus.CREATED);
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<Patient>> all() {
         return ResponseEntity.ok(patientService.getAllPatients());
+    }
+
+    @GetMapping("/by-last-name")
+    public ResponseEntity<List<Patient>> byLastName(@RequestParam String lastName) {
+        return ResponseEntity.ok(patientService.getByLastName(lastName));
+    }
+
+    @GetMapping("/frequent")
+    public ResponseEntity<List<Patient>> frequent(@RequestParam long min) {
+        return ResponseEntity.ok(patientService.getFrequent(min));
+    }
+
+    @GetMapping("/{ssNumber}/upcoming")
+    public ResponseEntity<?> upcoming(@PathVariable String ssNumber) {
+        if (patientService.getBySsNumber(ssNumber).isEmpty()) {
+            return new ResponseEntity<>("That patient with that ssNumber does not exist", HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(patientService.getUpcoming(ssNumber));
     }
 
     @GetMapping("/{id}")
@@ -54,23 +65,5 @@ public class PatientController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable UUID id) {
         return ResponseEntity.ok(patientService.deletePatient(id));
-    }
-
-    @GetMapping("/by-last-name")
-    public ResponseEntity<List<Patient>> byLastName(@RequestParam String lastName) {
-        return ResponseEntity.ok(patientService.getByLastName(lastName));
-    }
-
-    @GetMapping("/frequent")
-    public ResponseEntity<List<Patient>> frequent(@RequestParam long min) {
-        return ResponseEntity.ok(patientService.getFrequent(min));
-    }
-
-    @GetMapping("/of-doctor/{doctorId}")
-    public ResponseEntity<?> ofDoctor(@PathVariable UUID doctorId) {
-        if (doctorService.getDoctorById(doctorId).isEmpty()) {
-            return new ResponseEntity<>("The doctor with that id does not exist", HttpStatus.NOT_FOUND);
-        }
-        return ResponseEntity.ok(appointmentService.getPatientsOf(doctorId));
     }
 }

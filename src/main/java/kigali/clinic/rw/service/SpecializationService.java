@@ -6,11 +6,8 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import kigali.clinic.rw.domain.Doctor;
 import kigali.clinic.rw.domain.Specialization;
-import kigali.clinic.rw.repository.DoctorRepository;
 import kigali.clinic.rw.repository.SpecializationRepository;
 
 @Service
@@ -18,9 +15,6 @@ public class SpecializationService {
 
     @Autowired
     private SpecializationRepository specializationRepo;
-
-    @Autowired
-    private DoctorRepository doctorRepo;
 
     public String saveSpecialization(Specialization spec) {
         if (spec.getName() == null || spec.getName().isBlank()) {
@@ -58,36 +52,6 @@ public class SpecializationService {
         }
         specializationRepo.deleteById(id);
         return "deleted successfully";
-    }
-
-    @Transactional
-    public String addDoctorToSpecialization(UUID specId, UUID doctorId) {
-        Optional<Specialization> specOpt = specializationRepo.findById(specId);
-        Optional<Doctor> docOpt = doctorRepo.findById(doctorId);
-        if (specOpt.isEmpty()) return "Specialization not found";
-        if (docOpt.isEmpty()) return "Doctor not found";
-
-        Specialization spec = specOpt.get();
-        Doctor doctor = docOpt.get();
-        if (spec.getDoctors().contains(doctor)) {
-            return "This doctor already has this specialization";
-        }
-        spec.getDoctors().add(doctor);
-        specializationRepo.save(spec);
-        return "doctor linked to specialization successfully";
-    }
-
-    @Transactional
-    public String removeDoctorFromSpecialization(UUID specId, UUID doctorId) {
-        Optional<Specialization> specOpt = specializationRepo.findById(specId);
-        Optional<Doctor> docOpt = doctorRepo.findById(doctorId);
-        if (specOpt.isEmpty() || docOpt.isEmpty()) {
-            return "Not found";
-        }
-        Specialization spec = specOpt.get();
-        spec.getDoctors().remove(docOpt.get());
-        specializationRepo.save(spec);
-        return "doctor removed from specialization successfully";
     }
 
     public List<Specialization> getUnused() {
